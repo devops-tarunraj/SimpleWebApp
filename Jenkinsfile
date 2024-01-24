@@ -3,49 +3,57 @@ pipeline {
 
     environment {
         // Define environment variables if needed
-        JAVA_HOME = tool 'jdk11' // Assumes you have a JDK 11 tool configured in Jenkins
-        MAVEN_HOME = tool 'maven3' // Assumes you have Maven 3 tool configured in Jenkins
+        MAVEN_HOME = tool 'Maven'
+        NEXUS_URL = 'http://your-nexus-server/nexus'
+        NEXUS_CREDENTIAL_ID = 'your-nexus-credentials-id'
     }
 
     stages {
         stage('Checkout') {
             steps {
-                // Checkout the source code from version control
+                // Checkout the code from Git
                 checkout scm
             }
         }
 
         stage('Build') {
             steps {
-                // Build the Java project using Maven
-                sh "${MAVEN_HOME}/bin/mvn clean install"
+                // Set up Maven
+                script {
+                    def mvnHome = tool 'Maven'
+                    def mavenCMD = "${mvnHome}/bin/mvn"
+
+                    // Build the Maven project
+                    sh "${mavenCMD} clean install"
+                }
             }
         }
 
-        stage('Test') {
+        stage('Deploy to Nexus') {
             steps {
-                // Run tests (if applicable)
-                sh "${MAVEN_HOME}/bin/mvn test"
-            }
-        }
+                script {
+                    def mvnHome = tool 'Maven'
+                    def mavenCMD = "${mvnHome}/bin/mvn"
 
-        stage('Deploy') {
-            steps {
-                // Perform deployment tasks (e.g., deploy to a server)
-                // This step might involve copying artifacts to a deployment server or container
-                // Example: sh 'scp target/your-artifact.jar user@your-server:/path/to/deployment/directory/'
+                    // Deploy the Maven artifacts to Nexus
+                    sh "${mavenCMD} deploy -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true"
+                }
             }
         }
     }
 
     post {
-        success {
-            // Actions to be taken if the pipeline succeeds
-            // For example, trigger a deployment job or send notifications
+        always {
+            // Cleanup steps, if necessary
         }
+
+        success {
+            echo 'Build and deployment successful!'
+        }
+
         failure {
-            // Actions to be taken if the pipeline fails
-            // For example, send notifications or roll back deployments
+            echo 'Build or deployment failed!'
         }
     }
 }
+
