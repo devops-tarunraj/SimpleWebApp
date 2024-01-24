@@ -1,6 +1,5 @@
 pipeline {
     agent any
-
     environment {
         MAVEN_TOOL = 'maven3'
         NEXUS_URL = 'http://18.191.170.217:8081/nexus'
