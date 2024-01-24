@@ -5,8 +5,7 @@ pipeline {
         // Define environment variables if needed
         MAVEN_HOME = tool 'Maven'
         NEXUS_URL = 'http://http://18.191.170.217:8081/nexus'
-        NEXUS_CREDENTIAL_ID = 'your-nexus-credentials-id'
-    }
+        NEXUS_CREDENTIAL_ID = 'nexus-logins'
 
     stages {
         stage('Checkout') {
