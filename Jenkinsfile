@@ -4,17 +4,33 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Checkout the code from the GitHub repository
-                git 'https://github.com/devops-tarunraj/SimpleWebApp.git'
+                git ''
             }
         }
+
         stage('Build') {
             steps {
-                // Use the configured Maven installation to build the project
-                withMaven(maven: 'maven') {
-                    sh 'mvn clean package' // Execute Maven command to build the project and package it into a JAR file
-                }
+                sh 'mvn clean install'
             }
+        }
+
+        stage('Test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo 'Deploying to production'
+                // Your deployment steps go here
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'This will always run'
         }
     }
 }
